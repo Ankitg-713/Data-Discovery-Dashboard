@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Header } from "@/components/layout/Header";
 import { Card, CardHeader, CardTitle, CardContent, Badge } from "@/components/ui";
@@ -123,6 +123,10 @@ const dataSources = [
   { name: "PostgreSQL", type: "Database", status: "active", records: 890000, icon: Server },
   { name: "MongoDB", type: "NoSQL", status: "syncing", records: 450000, icon: Database },
   { name: "Snowflake", type: "Data Warehouse", status: "active", records: 267392, icon: Server },
+  { name: "Azure Blob", type: "Cloud Storage", status: "active", records: 320000, icon: Cloud },
+  { name: "MySQL", type: "Database", status: "active", records: 156000, icon: Database },
+  { name: "Redis", type: "Cache", status: "syncing", records: 89000, icon: Server },
+  { name: "Google BigQuery", type: "Data Warehouse", status: "active", records: 534000, icon: Database },
 ];
 
 const colorClasses = {
@@ -171,6 +175,37 @@ const itemVariants = {
 };
 
 export default function DashboardPage() {
+  const dataSourcesRef = useRef<HTMLDivElement>(null);
+  const recentAlertsRef = useRef<HTMLDivElement>(null);
+  const [highlightDataSources, setHighlightDataSources] = useState(false);
+  const [highlightAlerts, setHighlightAlerts] = useState(false);
+
+  const scrollToDataSources = () => {
+    dataSourcesRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    
+    // Trigger highlight after scroll animation completes
+    setTimeout(() => {
+      setHighlightDataSources(true);
+      // Remove highlight after 2.5 seconds (matches animation duration)
+      setTimeout(() => {
+        setHighlightDataSources(false);
+      }, 2500);
+    }, 500);
+  };
+
+  const scrollToAlerts = () => {
+    recentAlertsRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    
+    // Trigger highlight after scroll animation completes
+    setTimeout(() => {
+      setHighlightAlerts(true);
+      // Remove highlight after 2.5 seconds (matches animation duration)
+      setTimeout(() => {
+        setHighlightAlerts(false);
+      }, 2500);
+    }, 500);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       <Header
@@ -192,12 +227,20 @@ export default function DashboardPage() {
           >
             {statsCards.map((stat, index) => {
               const colors = colorClasses[stat.color as keyof typeof colorClasses];
+              const isClickable = stat.title === "Total Data Sources" || stat.title === "Security Alerts";
+              const handleClick = stat.title === "Total Data Sources" 
+                ? scrollToDataSources 
+                : stat.title === "Security Alerts" 
+                  ? scrollToAlerts 
+                  : undefined;
               return (
                 <motion.div
                   key={stat.title}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
+                  onClick={handleClick}
+                  className={isClickable ? "cursor-pointer" : ""}
                 >
                   <Card className="relative overflow-hidden" hover>
                     <div className={`absolute top-0 right-0 w-32 h-32 ${colors.bg} rounded-full blur-3xl -mr-16 -mt-16 opacity-50`} />
@@ -302,8 +345,15 @@ export default function DashboardPage() {
           {/* Bottom Row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Recent Alerts */}
-            <motion.div variants={itemVariants} className="lg:col-span-1">
-              <Card padding="lg" className="h-full">
+            <motion.div variants={itemVariants} className="lg:col-span-1" ref={recentAlertsRef}>
+              <Card 
+                padding="lg" 
+                className={`h-full transition-all duration-300 ${
+                  highlightAlerts 
+                    ? "ring-2 ring-amber-500 ring-offset-2 animate-highlight-blink-amber" 
+                    : ""
+                }`}
+              >
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle>Recent Alerts</CardTitle>
@@ -380,8 +430,15 @@ export default function DashboardPage() {
             </motion.div>
 
             {/* Data Sources Status */}
-            <motion.div variants={itemVariants}>
-              <Card padding="lg" className="h-full">
+            <motion.div variants={itemVariants} ref={dataSourcesRef}>
+              <Card 
+                padding="lg" 
+                className={`h-full transition-all duration-300 ${
+                  highlightDataSources 
+                    ? "ring-2 ring-cyan-500 ring-offset-2 animate-highlight-blink" 
+                    : ""
+                }`}
+              >
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle>Data Sources</CardTitle>
@@ -391,7 +448,7 @@ export default function DashboardPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
+                  <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1 scrollbar-thin">
                     {dataSources.map((source) => (
                       <motion.div
                         key={source.name}
