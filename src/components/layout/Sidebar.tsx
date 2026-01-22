@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
+  Activity,
   LayoutDashboard,
   Search,
   Shield,
@@ -24,6 +25,12 @@ interface SidebarProps {
 
 const navItems = [
   {
+    name: "Observability",
+    href: "/observability",
+    icon: Activity,
+    badge: null,
+  },
+  {
     name: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
@@ -33,7 +40,7 @@ const navItems = [
     name: "Data Discovery",
     href: "/data-discovery",
     icon: Search,
-    badge: "New",
+    badge: null,
   },
 ];
 

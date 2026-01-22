@@ -141,10 +141,16 @@ export function DataChart({
           <Tooltip content={<CustomTooltip />} />
           <Bar
             dataKey="value"
-            fill={colors[0]}
             radius={[4, 4, 0, 0]}
             name="Value"
-          />
+          >
+            {data.map((_, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={colors[index % colors.length]}
+              />
+            ))}
+          </Bar>
           {data[0]?.value2 !== undefined && (
             <Bar
               dataKey="value2"
