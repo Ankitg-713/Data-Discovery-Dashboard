@@ -16,6 +16,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [particles, setParticles] = useState<Array<{left: number, top: number, duration: number, delay: number}>>([]);
   const router = useRouter();
   const { login, isAuthenticated } = useAuth();
 
@@ -36,6 +37,17 @@ export default function LoginPage() {
       router.push("/observability");
     }
   }, [isAuthenticated, router]);
+
+  // Generate particles only on client side to avoid hydration mismatch
+  useEffect(() => {
+    const generatedParticles = Array.from({ length: 15 }, () => ({
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      duration: 3 + Math.random() * 4,
+      delay: Math.random() * 2,
+    }));
+    setParticles(generatedParticles);
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,22 +132,22 @@ export default function LoginPage() {
 
       {/* Floating particles */}
       <div className="absolute inset-0 pointer-events-none">
-        {[...Array(15)].map((_, i) => (
+        {particles.map((particle, i) => (
           <motion.div
             key={i}
             className="absolute w-1.5 h-1.5 bg-emerald-500/40 rounded-full"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: `${particle.left}%`,
+              top: `${particle.top}%`,
             }}
             animate={{
               y: [0, -30, 0],
               opacity: [0.3, 0.7, 0.3],
             }}
             transition={{
-              duration: 3 + Math.random() * 4,
+              duration: particle.duration,
               repeat: Infinity,
-              delay: Math.random() * 2,
+              delay: particle.delay,
             }}
           />
         ))}
@@ -169,9 +181,21 @@ export default function LoginPage() {
               />
             </motion.div>
           </div>
-          <p className="text-slate-500 text-sm tracking-wide">
-            Full-stack Data Vaulting Platform
-          </p>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/60 shadow-sm"
+          >
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#036E6E] via-emerald-600 to-teal-600 font-semibold text-base tracking-wide">
+              Full-Stack Data Vaulting Platform
+            </span>
+            <motion.div
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="w-2 h-2 rounded-full bg-emerald-500"
+            />
+          </motion.div>
         </motion.div>
 
         {/* Login Card */}
@@ -285,7 +309,7 @@ export default function LoginPage() {
         </motion.div>
 
         {/* Security badges */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
@@ -309,7 +333,7 @@ export default function LoginPage() {
             </div>
             <span>256-bit SSL</span>
           </div>
-        </motion.div>
+        </motion.div> */}
       </motion.div>
     </div>
   );

@@ -10,7 +10,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Securelytix | Data Discovery Dashboard",
+  title: "Securelytix | Full-Stack Data Vaulting Platform",
   description: "Enterprise data discovery and classification platform for secure data management",
   keywords: ["data discovery", "data classification", "security", "compliance", "AI"],
   authors: [{ name: "Securelytix" }],
