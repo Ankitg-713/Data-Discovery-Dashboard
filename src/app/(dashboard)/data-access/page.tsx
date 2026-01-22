@@ -15,6 +15,18 @@ import {
 } from "lucide-react";
 
 /* -------------------- Mock Metrics -------------------- */
+type AccessOperation = "read" | "detokenize";
+type AccessStatus = "allowed" | "denied";
+
+interface AccessLog {
+  time: string;
+  actor: string;
+  resource: string;
+  purpose: string;
+  operation: AccessOperation;
+  status: AccessStatus;
+}
+
 
 const accessMetrics = [
   {
@@ -39,7 +51,7 @@ const accessMetrics = [
 
 /* -------------------- Access Logs -------------------- */
 
-const accessLogs = [
+const accessLogs: AccessLog[] = [
   {
     time: "14:30:11",
     actor: "payout-service",
@@ -91,15 +103,15 @@ const itemVariants = {
 
 /* -------------------- Helpers -------------------- */
 
-const statusBadge = {
+const statusBadge: Record<AccessStatus, "success" | "danger"> = {
   allowed: "success",
   denied: "danger",
-} as const;
+};
 
-const operationBadge = {
+const operationBadge: Record<AccessOperation, "info" | "purple"> = {
   read: "info",
   detokenize: "purple",
-} as const;
+};
 
 /* -------------------- Page -------------------- */
 
