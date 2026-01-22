@@ -31,7 +31,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               "w-full px-4 py-3 rounded-xl",
               "bg-white border border-slate-200",
               "text-slate-800 placeholder-slate-400",
-              "focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20",
+              "focus:border-[#036E6E] focus:ring-2 focus:ring-[#036E6E]/20",
               "transition-all duration-300 outline-none",
               icon && iconPosition === "left" && "pl-11",
               icon && iconPosition === "right" && "pr-11",

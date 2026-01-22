@@ -17,7 +17,7 @@ import {
 const orchestratorStats = [
   { label: "Active Jobs", value: 3, icon: Activity },
   { label: "Throughput", value: "45k rows/sec", icon: Database },
-  { label: "CPU Cap", value: "15%", icon: Cpu },
+  { label: "CPU Cap", value: "2%", icon: Cpu },
 ];
 
 const backfillJob = {
@@ -142,7 +142,7 @@ export default function BackfillTokenizationPage() {
                       initial={{ width: 0 }}
                       animate={{ width: `${backfillJob.progress}%` }}
                       transition={{ duration: 0.8 }}
-                      className="h-full bg-gradient-to-r from-cyan-500 to-blue-600"
+                      className="h-full bg-gradient-to-r from-[#024443] to-[#036E6E]"
                     />
                   </div>
                 </div>
@@ -180,10 +180,10 @@ export default function BackfillTokenizationPage() {
           <motion.div variants={itemVariants}>
             <Card
               padding="lg"
-              className="bg-gradient-to-r from-cyan-50 via-blue-50 to-purple-50 border-cyan-100"
+              className="bg-gradient-to-r from-emerald-50 via-teal-50 to-purple-50 border-emerald-100"
             >
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#024443] to-[#036E6E] flex items-center justify-center shadow-lg">
                   <CheckCircle2 className="w-6 h-6 text-white" />
                 </div>
                 <div>

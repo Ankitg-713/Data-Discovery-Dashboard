@@ -131,9 +131,9 @@ const dataSources = [
 
 const colorClasses = {
   cyan: {
-    bg: "bg-cyan-50",
-    text: "text-cyan-600",
-    icon: "bg-gradient-to-br from-cyan-500 to-cyan-600",
+    bg: "bg-emerald-50",
+    text: "text-[#036E6E]",
+    icon: "bg-gradient-to-br from-[#024443] to-[#036E6E]",
   },
   purple: {
     bg: "bg-purple-50",
@@ -156,7 +156,7 @@ const severityColors: Record<string, { badge: "danger" | "warning" | "success" |
   critical: { badge: "danger", dot: "bg-red-500" },
   high: { badge: "warning", dot: "bg-orange-500" },
   medium: { badge: "default", dot: "bg-yellow-500" },
-  info: { badge: "info", dot: "bg-blue-500" },
+  info: { badge: "info", dot: "bg-[#036E6E]" },
 };
 
 const containerVariants = {
@@ -177,8 +177,12 @@ const itemVariants = {
 export default function DashboardPage() {
   const dataSourcesRef = useRef<HTMLDivElement>(null);
   const recentAlertsRef = useRef<HTMLDivElement>(null);
+  const riskDistributionRef = useRef<HTMLDivElement>(null);
+  const dataClassificationRef = useRef<HTMLDivElement>(null);
   const [highlightDataSources, setHighlightDataSources] = useState(false);
   const [highlightAlerts, setHighlightAlerts] = useState(false);
+  const [highlightRiskDistribution, setHighlightRiskDistribution] = useState(false);
+  const [highlightDataClassification, setHighlightDataClassification] = useState(false);
 
   const scrollToDataSources = () => {
     dataSourcesRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -206,6 +210,32 @@ export default function DashboardPage() {
     }, 500);
   };
 
+  const scrollToRiskDistribution = () => {
+    riskDistributionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    
+    // Trigger highlight after scroll animation completes
+    setTimeout(() => {
+      setHighlightRiskDistribution(true);
+      // Remove highlight after 2.5 seconds (matches animation duration)
+      setTimeout(() => {
+        setHighlightRiskDistribution(false);
+      }, 2500);
+    }, 500);
+  };
+
+  const scrollToDataClassification = () => {
+    dataClassificationRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    
+    // Trigger highlight after scroll animation completes
+    setTimeout(() => {
+      setHighlightDataClassification(true);
+      // Remove highlight after 2.5 seconds (matches animation duration)
+      setTimeout(() => {
+        setHighlightDataClassification(false);
+      }, 2500);
+    }, 500);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       <Header
@@ -227,12 +257,19 @@ export default function DashboardPage() {
           >
             {statsCards.map((stat, index) => {
               const colors = colorClasses[stat.color as keyof typeof colorClasses];
-              const isClickable = stat.title === "Total Data Sources" || stat.title === "Security Alerts";
+              const isClickable = stat.title === "Total Data Sources" || 
+                                 stat.title === "Security Alerts" ||
+                                 stat.title === "Sensitive Records" ||
+                                 stat.title === "Active Scans";
               const handleClick = stat.title === "Total Data Sources" 
                 ? scrollToDataSources 
                 : stat.title === "Security Alerts" 
-                  ? scrollToAlerts 
-                  : undefined;
+                  ? scrollToAlerts
+                  : stat.title === "Sensitive Records"
+                    ? scrollToRiskDistribution
+                    : stat.title === "Active Scans"
+                      ? scrollToDataClassification
+                      : undefined;
               return (
                 <motion.div
                   key={stat.title}
@@ -286,7 +323,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-cyan-500" />
+                        <div className="w-3 h-3 rounded-full bg-[#036E6E]" />
                         <span className="text-sm text-slate-500">Total Access</span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -300,7 +337,7 @@ export default function DashboardPage() {
                   <DataChart
                     data={accessTrendData}
                     type="area"
-                    colors={["#06b6d4", "#8b5cf6"]}
+                    colors={["#036E6E", "#8b5cf6"]}
                     height={280}
                   />
                 </CardContent>
@@ -308,8 +345,15 @@ export default function DashboardPage() {
             </motion.div>
 
             {/* Data Classification Pie chart */}
-            <motion.div variants={itemVariants}>
-              <Card padding="lg" className="h-full">
+            <motion.div variants={itemVariants} ref={dataClassificationRef}>
+              <Card 
+                padding="lg" 
+                className={`h-full transition-all duration-300 ${
+                  highlightDataClassification 
+                    ? "ring-2 ring-[#036E6E] ring-offset-2 animate-highlight-blink" 
+                    : ""
+                }`}
+              >
                 <CardHeader>
                   <CardTitle>Data Classification</CardTitle>
                   <p className="text-sm text-slate-500 mt-1">
@@ -320,7 +364,7 @@ export default function DashboardPage() {
                   <DataChart
                     data={dataClassificationData}
                     type="pie"
-                    colors={["#06b6d4", "#8b5cf6", "#10b981", "#f59e0b", "#94a3b8"]}
+                    colors={["#036E6E", "#8b5cf6", "#10b981", "#f59e0b", "#94a3b8"]}
                     height={200}
                   />
                   <div className="grid grid-cols-2 gap-2 mt-4">
@@ -329,7 +373,7 @@ export default function DashboardPage() {
                         <div
                           className="w-2.5 h-2.5 rounded-full"
                           style={{
-                            backgroundColor: ["#06b6d4", "#8b5cf6", "#10b981", "#f59e0b", "#94a3b8"][index],
+                            backgroundColor: ["#036E6E", "#8b5cf6", "#10b981", "#f59e0b", "#94a3b8"][index],
                           }}
                         />
                         <span className="text-xs text-slate-500">{item.name}</span>
@@ -357,7 +401,7 @@ export default function DashboardPage() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle>Recent Alerts</CardTitle>
-                    <button className="text-sm text-cyan-600 hover:text-cyan-700 transition-colors flex items-center gap-1">
+                    <button className="text-sm text-[#036E6E] hover:text-[#024443] transition-colors flex items-center gap-1">
                       View all <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -370,8 +414,8 @@ export default function DashboardPage() {
                         whileHover={{ x: 4 }}
                         className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer"
                       >
-                        <div className={`w-9 h-9 rounded-lg ${severityColors[alert.severity].badge === "danger" ? "bg-red-100" : severityColors[alert.severity].badge === "warning" ? "bg-amber-100" : "bg-blue-100"} flex items-center justify-center`}>
-                          <alert.icon className={`w-4 h-4 ${severityColors[alert.severity].badge === "danger" ? "text-red-600" : severityColors[alert.severity].badge === "warning" ? "text-amber-600" : "text-blue-600"}`} />
+                        <div className={`w-9 h-9 rounded-lg ${severityColors[alert.severity].badge === "danger" ? "bg-red-100" : severityColors[alert.severity].badge === "warning" ? "bg-amber-100" : "bg-emerald-100"} flex items-center justify-center`}>
+                          <alert.icon className={`w-4 h-4 ${severityColors[alert.severity].badge === "danger" ? "text-red-600" : severityColors[alert.severity].badge === "warning" ? "text-amber-600" : "text-[#036E6E]"}`} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-slate-700 truncate">
@@ -393,8 +437,15 @@ export default function DashboardPage() {
             </motion.div>
 
             {/* Risk Distribution */}
-            <motion.div variants={itemVariants}>
-              <Card padding="lg" className="h-full">
+            <motion.div variants={itemVariants} ref={riskDistributionRef}>
+              <Card 
+                padding="lg" 
+                className={`h-full transition-all duration-300 ${
+                  highlightRiskDistribution 
+                    ? "ring-2 ring-[#036E6E] ring-offset-2 animate-highlight-blink" 
+                    : ""
+                }`}
+              >
                 <CardHeader>
                   <CardTitle>Risk Distribution</CardTitle>
                   <p className="text-sm text-slate-500 mt-1">
@@ -435,14 +486,14 @@ export default function DashboardPage() {
                 padding="lg" 
                 className={`h-full transition-all duration-300 ${
                   highlightDataSources 
-                    ? "ring-2 ring-cyan-500 ring-offset-2 animate-highlight-blink" 
+                    ? "ring-2 ring-[#036E6E] ring-offset-2 animate-highlight-blink" 
                     : ""
                 }`}
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle>Data Sources</CardTitle>
-                    <button className="text-sm text-cyan-600 hover:text-cyan-700 transition-colors flex items-center gap-1">
+                    <button className="text-sm text-[#036E6E] hover:text-[#024443] transition-colors flex items-center gap-1">
                       Manage <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -484,10 +535,10 @@ export default function DashboardPage() {
 
           {/* Security Overview Bar */}
           <motion.div variants={itemVariants}>
-            <Card className="bg-gradient-to-r from-cyan-50 via-blue-50 to-purple-50 border-cyan-100" padding="lg">
+            <Card className="bg-gradient-to-r from-emerald-50 via-teal-50 to-purple-50 border-emerald-100" padding="lg">
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#024443] to-[#036E6E] flex items-center justify-center shadow-lg shadow-[#036E6E]/20">
                     <Lock className="w-7 h-7 text-white" />
                   </div>
                   <div>
@@ -503,7 +554,7 @@ export default function DashboardPage() {
                   <div className="h-12 w-px bg-slate-200" />
                   <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">
-                      <Users className="w-5 h-5 text-cyan-600" />
+                      <Users className="w-5 h-5 text-[#036E6E]" />
                       <div>
                         <p className="text-sm font-medium text-slate-700">234</p>
                         <p className="text-xs text-slate-500">Users</p>

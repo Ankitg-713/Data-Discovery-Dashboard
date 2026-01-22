@@ -33,7 +33,7 @@ const accessMetrics = [
     label: "Detokenization Requests (1h)",
     value: "1,000",
     icon: Unlock,
-    color: "text-cyan-600",
+    color: "text-[#036E6E]",
   },
   {
     label: "Denied Requests",

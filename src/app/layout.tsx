@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   description: "Enterprise data discovery and classification platform for secure data management",
   keywords: ["data discovery", "data classification", "security", "compliance", "AI"],
   authors: [{ name: "Securelytix" }],
+  icons: {
+    icon: "/securelytixFavicon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -23,6 +26,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/securelytixFavicon.svg" type="image/svg+xml" />
+      </head>
       <body className={`${plusJakarta.variable} font-sans antialiased`}>
         <AuthProvider>
           {children}

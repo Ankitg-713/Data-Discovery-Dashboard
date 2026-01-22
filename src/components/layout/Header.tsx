@@ -63,7 +63,7 @@ export function Header({ title, subtitle }: HeaderProps) {
           <input
             type="text"
             placeholder="Search..."
-            className="w-64 pl-10 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 placeholder-slate-400 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/20 transition-all outline-none text-sm"
+            className="w-64 pl-10 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 placeholder-slate-400 focus:border-[#036E6E] focus:ring-1 focus:ring-[#036E6E]/20 transition-all outline-none text-sm"
           />
           <kbd className="absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-xs text-slate-400 bg-white border border-slate-200 rounded">
             ⌘K
@@ -99,7 +99,7 @@ export function Header({ title, subtitle }: HeaderProps) {
                 <div className="p-4 border-b border-slate-100">
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold text-slate-800">Notifications</h3>
-                    <button className="text-xs text-cyan-600 hover:text-cyan-700 transition-colors">
+                    <button className="text-xs text-[#036E6E] hover:text-[#024443] transition-colors">
                       Mark all read
                     </button>
                   </div>
@@ -136,7 +136,7 @@ export function Header({ title, subtitle }: HeaderProps) {
                   ))}
                 </div>
                 <div className="p-3 bg-slate-50">
-                  <button className="w-full py-2 text-sm text-cyan-600 hover:text-cyan-700 transition-colors">
+                  <button className="w-full py-2 text-sm text-[#036E6E] hover:text-[#024443] transition-colors">
                     View all notifications
                   </button>
                 </div>
@@ -156,7 +156,7 @@ export function Header({ title, subtitle }: HeaderProps) {
             }}
             className="flex items-center gap-3 pl-3 pr-2 py-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-all"
           >
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-semibold text-sm shadow-md">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#024443] to-[#036E6E] flex items-center justify-center text-white font-semibold text-sm shadow-md">
               {user?.name?.charAt(0).toUpperCase() || "U"}
             </div>
             <div className="text-left hidden sm:block">

@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ import {
   ChevronRight,
   Database,
   Bell,
+  Plug,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -54,6 +56,12 @@ const navItems = [
     name: "Backfill Tokenization",
     href: "/backfill-tokenization",
     icon: RefreshCcw,
+    badge: null,
+  },
+  {
+    name: "Integrations",
+    href: "/integrations",
+    icon: Plug,
     badge: null,
   },
 ];
@@ -105,21 +113,34 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       {/* Logo Section */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200">
         <Link href="/observability" className="flex items-center gap-3">
-          <motion.div
-            whileHover={{ rotate: 5, scale: 1.05 }}
-            className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20"
-          >
-            <Shield className="w-6 h-6 text-white" />
-          </motion.div>
-          {!isCollapsed && (
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="text-xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent"
+          {!isCollapsed ? (
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="flex items-center"
             >
-              Securelytix
-            </motion.span>
+              <Image
+                src="/Securelytix.svg"
+                alt="Securelytix"
+                width={140}
+                height={28}
+                className="h-7 w-auto"
+                priority
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              whileHover={{ rotate: 5, scale: 1.05 }}
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+            >
+              <Image
+                src="/securelytixFavicon.svg"
+                alt="Securelytix"
+                width={31}
+                height={31}
+                className="w-8 h-8"
+                priority
+              />
+            </motion.div>
           )}
         </Link>
         <button
@@ -154,7 +175,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
                     className={cn(
                       "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group cursor-pointer",
                       isActive
-                        ? "bg-gradient-to-r from-cyan-50 to-blue-50 border border-cyan-200"
+                        ? "bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200"
                         : "hover:bg-slate-50"
                     )}
                   >
@@ -162,7 +183,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
                       className={cn(
                         "w-9 h-9 rounded-lg flex items-center justify-center transition-all",
                         isActive
-                          ? "bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/20"
+                          ? "bg-gradient-to-br from-[#024443] to-[#036E6E] shadow-lg shadow-[#036E6E]/20"
                           : "bg-slate-100 group-hover:bg-slate-200"
                       )}
                     >
@@ -178,13 +199,13 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
                         <span
                           className={cn(
                             "flex-1 font-medium",
-                            isActive ? "text-cyan-700" : "text-slate-600"
+                            isActive ? "text-[#024443]" : "text-slate-600"
                           )}
                         >
                           {item.name}
                         </span>
                         {item.badge && (
-                          <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-cyan-100 text-cyan-700 border border-cyan-200">
+                          <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-emerald-100 text-[#024443] border border-emerald-200">
                             {item.badge}
                           </span>
                         )}
@@ -246,10 +267,10 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="mx-1 p-4 rounded-2xl bg-gradient-to-br from-cyan-50 to-blue-50 border border-cyan-100"
+            className="mx-1 p-4 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100"
           >
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-md">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#024443] to-[#036E6E] flex items-center justify-center shadow-md">
                 <Database className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -269,7 +290,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
                 initial={{ width: 0 }}
                 animate={{ width: "68%" }}
                 transition={{ delay: 0.5, duration: 1 }}
-                className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"
+                className="h-full bg-gradient-to-r from-[#036E6E] to-[#41C28D] rounded-full"
               />
             </div>
             <p className="text-xs text-slate-400 mt-2">68% of monthly quota</p>

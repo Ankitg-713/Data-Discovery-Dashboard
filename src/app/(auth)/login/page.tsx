@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { Mail, Lock, Eye, EyeOff, Shield, ArrowRight } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui";
 import { Input } from "@/components/ui";
@@ -64,7 +65,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-50 via-cyan-50/30 to-blue-50 flex items-center justify-center">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-50 via-emerald-50/30 to-teal-50 flex items-center justify-center">
       {/* Animated gradient orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -77,7 +78,7 @@ export default function LoginPage() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-cyan-400/20 rounded-full blur-[120px]"
+          className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-emerald-400/20 rounded-full blur-[120px]"
         />
         <motion.div
           animate={{
@@ -89,7 +90,7 @@ export default function LoginPage() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-blue-400/20 rounded-full blur-[120px]"
+          className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-teal-400/20 rounded-full blur-[120px]"
         />
         <motion.div
           animate={{
@@ -110,8 +111,8 @@ export default function LoginPage() {
         className="absolute inset-0 opacity-40 pointer-events-none"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(6, 182, 212, 0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(6, 182, 212, 0.05) 1px, transparent 1px)
+            linear-gradient(rgba(3, 110, 110, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(3, 110, 110, 0.05) 1px, transparent 1px)
           `,
           backgroundSize: "60px 60px",
         }}
@@ -122,7 +123,7 @@ export default function LoginPage() {
         {[...Array(15)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1.5 h-1.5 bg-cyan-500/40 rounded-full"
+            className="absolute w-1.5 h-1.5 bg-emerald-500/40 rounded-full"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -153,16 +154,20 @@ export default function LoginPage() {
           transition={{ delay: 0.2 }}
           className="text-center mb-8"
         >
-          <div className="inline-flex items-center gap-3 mb-4">
+          <div className="inline-flex items-center justify-center mb-4">
             <motion.div
-              whileHover={{ rotate: 10, scale: 1.1 }}
-              className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30"
+              whileHover={{ scale: 1.05 }}
+              className="flex items-center"
             >
-              <Shield className="w-7 h-7 text-white" />
+              <Image
+                src="/Securelytix.svg"
+                alt="Securelytix"
+                width={177}
+                height={36}
+                className="h-9 w-auto"
+                priority
+              />
             </motion.div>
-            <span className="text-3xl font-bold bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Securelytix
-            </span>
           </div>
           <p className="text-slate-500 text-sm tracking-wide">
             Full-stack Data Vaulting Platform
@@ -234,7 +239,7 @@ export default function LoginPage() {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 rounded border-slate-300 bg-white text-cyan-500 focus:ring-cyan-500/20"
+                  className="w-4 h-4 rounded border-slate-300 bg-white text-[#036E6E] focus:ring-[#036E6E]/20"
                 />
                 <span className="text-sm text-slate-500">Remember me</span>
               </label>
@@ -244,7 +249,7 @@ export default function LoginPage() {
                   e.preventDefault();
                   // Handle forgot password - you can add routing here later
                 }}
-                className="text-sm text-cyan-600 hover:text-cyan-700 transition-colors"
+                className="text-sm text-[#036E6E] hover:text-[#024443] transition-colors"
               >
                 Forgot password?
               </button>
@@ -271,7 +276,7 @@ export default function LoginPage() {
                   e.preventDefault();
                   // Handle request access - you can add routing here later
                 }}
-                className="text-cyan-600 hover:text-cyan-700 transition-colors font-medium"
+                className="text-[#036E6E] hover:text-[#024443] transition-colors font-medium"
               >
                 Request access
               </button>

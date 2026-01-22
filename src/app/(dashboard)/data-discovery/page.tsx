@@ -288,9 +288,9 @@ const SortIcon = ({
 }) => {
   if (sortField !== field) return <ChevronDown className="w-4 h-4 opacity-30" />;
   return sortDirection === "desc" ? (
-    <ChevronDown className="w-4 h-4 text-cyan-600" />
+    <ChevronDown className="w-4 h-4 text-[#036E6E]" />
   ) : (
-    <ChevronUp className="w-4 h-4 text-cyan-600" />
+    <ChevronUp className="w-4 h-4 text-[#036E6E]" />
   );
 };
 
@@ -360,7 +360,7 @@ export default function DataDiscoveryPage() {
               transition={{ delay: index * 0.1 }}
             >
               <Card className="relative overflow-hidden" hover>
-                <div className="absolute top-0 right-0 w-20 h-20 bg-cyan-50 rounded-full blur-2xl -mr-10 -mt-10" />
+                <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-50 rounded-full blur-2xl -mr-10 -mt-10" />
                 <CardContent className="relative">
                   <div className="flex items-start justify-between mb-3">
                     <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
@@ -414,7 +414,7 @@ export default function DataDiscoveryPage() {
               >
                 Filters
                 {(typeFilter !== "all" || riskFilter !== "all" || statusFilter !== "all") && (
-                  <span className="ml-2 w-5 h-5 rounded-full bg-cyan-100 text-cyan-700 text-xs flex items-center justify-center">
+                  <span className="ml-2 w-5 h-5 rounded-full bg-emerald-100 text-[#024443] text-xs flex items-center justify-center">
                     {[typeFilter, riskFilter, statusFilter].filter((f) => f !== "all").length}
                   </span>
                 )}
@@ -450,7 +450,7 @@ export default function DataDiscoveryPage() {
                       <select
                         value={typeFilter}
                         onChange={(e) => setTypeFilter(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/20 transition-all outline-none text-sm"
+                        className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 focus:border-[#036E6E] focus:ring-1 focus:ring-[#036E6E]/20 transition-all outline-none text-sm"
                       >
                         {typeFilters.map((filter) => (
                           <option key={filter.value} value={filter.value}>
@@ -468,7 +468,7 @@ export default function DataDiscoveryPage() {
                       <select
                         value={riskFilter}
                         onChange={(e) => setRiskFilter(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/20 transition-all outline-none text-sm"
+                        className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 focus:border-[#036E6E] focus:ring-1 focus:ring-[#036E6E]/20 transition-all outline-none text-sm"
                       >
                         {riskFilters.map((filter) => (
                           <option key={filter.value} value={filter.value}>
@@ -486,7 +486,7 @@ export default function DataDiscoveryPage() {
                       <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/20 transition-all outline-none text-sm"
+                        className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 focus:border-[#036E6E] focus:ring-1 focus:ring-[#036E6E]/20 transition-all outline-none text-sm"
                       >
                         {statusFilters.map((filter) => (
                           <option key={filter.value} value={filter.value}>
@@ -744,10 +744,10 @@ export default function DataDiscoveryPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <Card className="bg-gradient-to-r from-purple-50 via-blue-50 to-cyan-50 border-purple-100" padding="lg">
+          <Card className="bg-gradient-to-r from-purple-50 via-teal-50 to-emerald-50 border-purple-100" padding="lg">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center shadow-lg">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-[#036E6E] flex items-center justify-center shadow-lg">
                   <Shield className="w-6 h-6 text-white" />
                 </div>
                 <div>

@@ -18,11 +18,11 @@ interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary: `
-    bg-gradient-to-r from-cyan-500 to-blue-600
+    bg-gradient-to-r from-[#024443] via-[#036E6E] to-[#41C28D]
     text-white font-semibold
-    shadow-lg shadow-cyan-500/25
-    hover:shadow-xl hover:shadow-cyan-500/30
-    hover:from-cyan-400 hover:to-blue-500
+    shadow-lg shadow-[#036E6E]/25
+    hover:shadow-xl hover:shadow-[#036E6E]/30
+    hover:from-[#036E6E] hover:via-[#41C28D] hover:to-[#41C28D]
   `,
   secondary: `
     bg-white border border-slate-200
