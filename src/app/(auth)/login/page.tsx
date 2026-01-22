@@ -12,14 +12,27 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { login, isAuthenticated } = useAuth();
 
+  // Load saved email from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedEmail = localStorage.getItem("securelytix_remembered_email");
+      const savedRememberMe = localStorage.getItem("securelytix_remember_me");
+      if (savedEmail && savedRememberMe === "true") {
+        setEmail(savedEmail);
+        setRememberMe(true);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/dashboard");
+      router.push("/observability");
     }
   }, [isAuthenticated, router]);
 
@@ -31,7 +44,15 @@ export default function LoginPage() {
     try {
       const success = await login(email, password);
       if (success) {
-        router.push("/dashboard");
+        // Handle remember me
+        if (rememberMe) {
+          localStorage.setItem("securelytix_remembered_email", email);
+          localStorage.setItem("securelytix_remember_me", "true");
+        } else {
+          localStorage.removeItem("securelytix_remembered_email");
+          localStorage.removeItem("securelytix_remember_me");
+        }
+        router.push("/observability");
       } else {
         setError("Invalid credentials. Please try again.");
       }
@@ -186,7 +207,8 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-[38px] text-slate-400 hover:text-slate-600 transition-colors"
+                className="absolute right-4 text-slate-400 hover:text-slate-600 transition-colors z-10"
+                style={{ top: "calc(1.25rem + 0.5rem + 0.75rem)" }}
               >
                 {showPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -210,16 +232,22 @@ export default function LoginPage() {
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   className="w-4 h-4 rounded border-slate-300 bg-white text-cyan-500 focus:ring-cyan-500/20"
                 />
                 <span className="text-sm text-slate-500">Remember me</span>
               </label>
-              <a
-                href="#"
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  // Handle forgot password - you can add routing here later
+                }}
                 className="text-sm text-cyan-600 hover:text-cyan-700 transition-colors"
               >
                 Forgot password?
-              </a>
+              </button>
             </div>
 
             <Button
@@ -237,12 +265,16 @@ export default function LoginPage() {
           <div className="mt-6 pt-6 border-t border-slate-200">
             <p className="text-center text-sm text-slate-500">
               Don&apos;t have an account?{" "}
-              <a
-                href="#"
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  // Handle request access - you can add routing here later
+                }}
                 className="text-cyan-600 hover:text-cyan-700 transition-colors font-medium"
               >
                 Request access
-              </a>
+              </button>
             </p>
           </div>
         </motion.div>

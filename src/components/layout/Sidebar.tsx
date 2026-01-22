@@ -104,7 +104,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
     >
       {/* Logo Section */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200">
-        <Link href="/dashboard" className="flex items-center gap-3">
+        <Link href="/observability" className="flex items-center gap-3">
           <motion.div
             whileHover={{ rotate: 5, scale: 1.05 }}
             className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20"
@@ -206,28 +206,37 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           )}
           <nav className="space-y-1">
             {secondaryNavItems.map((item) => (
-              <motion.div
+              <button
                 key={item.name}
-                whileHover={{ x: 4 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-all duration-200 group cursor-pointer"
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  // Add navigation logic here when routes are ready
+                }}
+                className="w-full text-left"
               >
-                <div className="w-9 h-9 rounded-lg bg-slate-100 group-hover:bg-slate-200 flex items-center justify-center transition-all">
-                  <item.icon className="w-5 h-5 text-slate-500" />
-                </div>
-                {!isCollapsed && (
-                  <>
-                    <span className="flex-1 font-medium text-slate-600 group-hover:text-slate-800 transition-colors">
-                      {item.name}
-                    </span>
-                    {item.badge && (
-                      <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-500">
-                        {item.badge}
+                <motion.div
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-all duration-200 group cursor-pointer"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-slate-100 group-hover:bg-slate-200 flex items-center justify-center transition-all">
+                    <item.icon className="w-5 h-5 text-slate-500" />
+                  </div>
+                  {!isCollapsed && (
+                    <>
+                      <span className="flex-1 font-medium text-slate-600 group-hover:text-slate-800 transition-colors">
+                        {item.name}
                       </span>
-                    )}
-                  </>
-                )}
-              </motion.div>
+                      {item.badge && (
+                        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-500">
+                          {item.badge}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </motion.div>
+              </button>
             ))}
           </nav>
         </div>
@@ -272,20 +281,29 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       <div className="border-t border-slate-200 p-3">
         <nav className="space-y-1">
           {bottomNavItems.map((item) => (
-            <motion.div
+            <button
               key={item.name}
-              whileHover={{ x: 4 }}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-all duration-200 group cursor-pointer"
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                // Add navigation logic here when routes are ready
+              }}
+              className="w-full text-left"
             >
-              <div className="w-9 h-9 rounded-lg bg-slate-100 group-hover:bg-slate-200 flex items-center justify-center transition-all">
-                <item.icon className="w-5 h-5 text-slate-500" />
-              </div>
-              {!isCollapsed && (
-                <span className="font-medium text-slate-600 group-hover:text-slate-800 transition-colors">
-                  {item.name}
-                </span>
-              )}
-            </motion.div>
+              <motion.div
+                whileHover={{ x: 4 }}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-all duration-200 group cursor-pointer"
+              >
+                <div className="w-9 h-9 rounded-lg bg-slate-100 group-hover:bg-slate-200 flex items-center justify-center transition-all">
+                  <item.icon className="w-5 h-5 text-slate-500" />
+                </div>
+                {!isCollapsed && (
+                  <span className="font-medium text-slate-600 group-hover:text-slate-800 transition-colors">
+                    {item.name}
+                  </span>
+                )}
+              </motion.div>
+            </button>
           ))}
         </nav>
       </div>

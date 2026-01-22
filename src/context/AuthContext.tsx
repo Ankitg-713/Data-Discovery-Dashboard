@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Mock authentication - in production, this would be a real API call
     if (email && password) {
       const mockUser: User = {
-        id: "usr_" + Math.random().toString(36).substr(2, 9),
+        id: "usr_" + Math.random().toString(36).slice(2, 11),
         email: email,
         name: email.split("@")[0].charAt(0).toUpperCase() + email.split("@")[0].slice(1),
         role: "Admin",
