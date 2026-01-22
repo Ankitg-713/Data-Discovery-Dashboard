@@ -144,7 +144,7 @@ export default function LoginPage() {
             </span>
           </div>
           <p className="text-slate-500 text-sm tracking-wide">
-            Data Discovery & Classification Platform
+            Full-stack Data Vaulting Platform
           </p>
         </motion.div>
 
