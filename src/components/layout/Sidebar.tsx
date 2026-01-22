@@ -9,6 +9,8 @@ import {
   Activity,
   LayoutDashboard,
   Search,
+  Key,
+  RefreshCcw,
   Shield,
   Settings,
   HelpCircle,
@@ -40,6 +42,18 @@ const navItems = [
     name: "Data Discovery",
     href: "/data-discovery",
     icon: Search,
+    badge: null,
+  },
+  {
+    name: "Data Access",
+    href: "/data-access",
+    icon: Key,
+    badge: null,
+  },
+  {
+    name: "Backfill Tokenization",
+    href: "/backfill-tokenization",
+    icon: RefreshCcw,
     badge: null,
   },
 ];
