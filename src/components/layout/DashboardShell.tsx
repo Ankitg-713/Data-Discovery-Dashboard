@@ -18,8 +18,10 @@ export default function DashboardShell({
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
-  // Mark client mount
+  // Mark client mount - necessary for Next.js SSR/client hydration
+  // This is a valid pattern to prevent hydration mismatches
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

@@ -3,7 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Header } from "@/components/layout/Header";
-import { Card, CardHeader, CardTitle, CardContent, Badge, Button } from "@/components/ui";
+import { Card, CardHeader, CardTitle, Badge, Button } from "@/components/ui";
 import {
   Unlock,
   Ban,
