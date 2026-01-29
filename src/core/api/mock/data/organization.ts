@@ -174,7 +174,7 @@ const sourceToType: Record<string, DataAssetSourceType> = {
   "Cache": "database",
   "Event Streaming": "database",
   "File Storage": "file",
-  "Search Engine": "server",
+  "Search Engine": "database",
 };
 
 export function getOrgAssets(): DataAsset[] {
