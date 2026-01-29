@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { motion } from "framer-motion";
-import { Shield } from "lucide-react";
+import { Shield, FlaskConical } from "lucide-react";
+import { DEMO_MODE } from "@/core/config";
 
 export default function DashboardShell({
   children,
@@ -64,18 +65,25 @@ export default function DashboardShell({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
-      <Sidebar
-        isCollapsed={sidebarCollapsed}
-        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-      />
-
-      <main
-        className="flex-1 min-h-screen bg-slate-50 transition-[margin-left] duration-300 ease-in-out"
-        style={{ marginLeft: sidebarCollapsed ? 80 : 280 }}
-      >
-        {children}
-      </main>
+    <div className="min-h-screen bg-slate-50 flex flex-col">
+      {DEMO_MODE && (
+        <div className="flex items-center justify-center gap-2 py-1.5 px-4 bg-amber-100 border-b border-amber-200 text-amber-800 text-sm font-medium">
+          <FlaskConical className="w-4 h-4 shrink-0" />
+          <span>Demo mode — mock data. All metrics are simulated and connected across pages.</span>
+        </div>
+      )}
+      <div className="flex flex-1 min-h-0">
+        <Sidebar
+          isCollapsed={sidebarCollapsed}
+          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
+        <main
+          className="flex-1 min-h-screen bg-slate-50 transition-[margin-left] duration-300 ease-in-out overflow-auto"
+          style={{ marginLeft: sidebarCollapsed ? 80 : 280 }}
+        >
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

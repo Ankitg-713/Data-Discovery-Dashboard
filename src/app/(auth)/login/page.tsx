@@ -307,33 +307,6 @@ export default function LoginPage() {
             </p>
           </div>
         </motion.div>
-
-        {/* Security badges */}
-        {/* <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="mt-8 flex items-center justify-center gap-6"
-        >
-          <div className="flex items-center gap-2 text-slate-400 text-xs">
-            <div className="w-4 h-4 rounded bg-emerald-100 flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-emerald-500" />
-            </div>
-            <span>SOC 2 Compliant</span>
-          </div>
-          <div className="flex items-center gap-2 text-slate-400 text-xs">
-            <div className="w-4 h-4 rounded bg-blue-100 flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-blue-500" />
-            </div>
-            <span>GDPR Ready</span>
-          </div>
-          <div className="flex items-center gap-2 text-slate-400 text-xs">
-            <div className="w-4 h-4 rounded bg-purple-100 flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-purple-500" />
-            </div>
-            <span>256-bit SSL</span>
-          </div>
-        </motion.div> */}
       </motion.div>
     </div>
   );

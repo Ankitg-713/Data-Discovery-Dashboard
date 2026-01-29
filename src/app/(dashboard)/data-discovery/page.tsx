@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Header } from "@/components/layout/Header";
-import { Card, CardContent, Badge, Button } from "@/components/ui";
+import { Card, CardContent, Badge, Button, Skeleton } from "@/components/ui";
 import { Input } from "@/components/ui";
 import { formatNumber, dataTypeIcons } from "@/lib/utils";
+import { getDataSourceIcon, sourceTypeIconMap } from "@/lib/iconMaps";
+import { useDataDiscovery } from "@/hooks";
 import {
   Search,
   Filter,
@@ -14,8 +16,6 @@ import {
   ChevronDown,
   ChevronUp,
   Database,
-  Server,
-  Cloud,
   FileText,
   Eye,
   Shield,
@@ -28,183 +28,6 @@ import {
   Copy,
   Play,
 } from "lucide-react";
-
-// Types
-interface SensitiveDataRecord {
-  id: string;
-  name: string;
-  type: "pii" | "phi" | "pci" | "credentials" | "financial" | "general";
-  source: string;
-  sourceType: "database" | "cloud" | "file";
-  location: string;
-  riskLevel: "critical" | "high" | "medium" | "low";
-  recordCount: number;
-  lastScanned: string;
-  status: "active" | "resolved" | "investigating";
-  classification: string[];
-}
-
-interface DataSource {
-  id: string;
-  name: string;
-  type: string;
-  status: "connected" | "syncing" | "error" | "pending";
-  lastSync: string;
-  totalRecords: number;
-  sensitiveRecords: number;
-  icon: React.ElementType;
-}
-
-// Mock Data
-const sensitiveDataRecords: SensitiveDataRecord[] = [
-  {
-    id: "1",
-    name: "customer_profiles",
-    type: "pii",
-    source: "PostgreSQL - Production",
-    sourceType: "database",
-    location: "customers.profiles",
-    riskLevel: "critical",
-    recordCount: 145000,
-    lastScanned: "2 hours ago",
-    status: "active",
-    classification: ["Email", "Phone", "SSN", "Address"],
-  },
-  {
-    id: "2",
-    name: "payment_transactions",
-    type: "pci",
-    source: "AWS S3 - Finance Bucket",
-    sourceType: "cloud",
-    location: "s3://finance-data/transactions/",
-    riskLevel: "critical",
-    recordCount: 89000,
-    lastScanned: "30 min ago",
-    status: "investigating",
-    classification: ["Credit Card", "CVV", "Expiry Date"],
-  },
-  {
-    id: "3",
-    name: "employee_records",
-    type: "pii",
-    source: "MongoDB - HR Database",
-    sourceType: "database",
-    location: "hr_db.employees",
-    riskLevel: "high",
-    recordCount: 12500,
-    lastScanned: "1 hour ago",
-    status: "active",
-    classification: ["SSN", "Salary", "Bank Account"],
-  },
-  {
-    id: "4",
-    name: "medical_claims",
-    type: "phi",
-    source: "Snowflake - Healthcare",
-    sourceType: "database",
-    location: "healthcare.claims",
-    riskLevel: "critical",
-    recordCount: 67000,
-    lastScanned: "45 min ago",
-    status: "active",
-    classification: ["Medical ID", "Diagnosis", "Prescription"],
-  },
-  {
-    id: "5",
-    name: "api_keys_backup",
-    type: "credentials",
-    source: "Google Cloud Storage",
-    sourceType: "cloud",
-    location: "gs://backup-vault/secrets/",
-    riskLevel: "critical",
-    recordCount: 342,
-    lastScanned: "15 min ago",
-    status: "investigating",
-    classification: ["API Keys", "Tokens", "Passwords"],
-  },
-  {
-    id: "6",
-    name: "quarterly_reports",
-    type: "financial",
-    source: "SharePoint - Finance",
-    sourceType: "file",
-    location: "/Finance/Reports/Q4-2024/",
-    riskLevel: "medium",
-    recordCount: 156,
-    lastScanned: "3 hours ago",
-    status: "resolved",
-    classification: ["Revenue", "Projections", "Margins"],
-  },
-  {
-    id: "7",
-    name: "user_sessions",
-    type: "general",
-    source: "Redis - Cache",
-    sourceType: "database",
-    location: "cache:sessions:*",
-    riskLevel: "low",
-    recordCount: 890000,
-    lastScanned: "5 min ago",
-    status: "active",
-    classification: ["Session ID", "User Agent"],
-  },
-  {
-    id: "8",
-    name: "vendor_contracts",
-    type: "pii",
-    source: "AWS S3 - Legal",
-    sourceType: "cloud",
-    location: "s3://legal-docs/vendors/",
-    riskLevel: "high",
-    recordCount: 2340,
-    lastScanned: "2 hours ago",
-    status: "active",
-    classification: ["Contact Info", "Tax ID", "Bank Details"],
-  },
-];
-
-const dataSources: DataSource[] = [
-  {
-    id: "1",
-    name: "PostgreSQL Production",
-    type: "Relational Database",
-    status: "connected",
-    lastSync: "2 min ago",
-    totalRecords: 2400000,
-    sensitiveRecords: 157500,
-    icon: Database,
-  },
-  {
-    id: "2",
-    name: "AWS S3",
-    type: "Cloud Storage",
-    status: "syncing",
-    lastSync: "Syncing...",
-    totalRecords: 890000,
-    sensitiveRecords: 89342,
-    icon: Cloud,
-  },
-  {
-    id: "3",
-    name: "MongoDB Atlas",
-    type: "NoSQL Database",
-    status: "connected",
-    lastSync: "5 min ago",
-    totalRecords: 1200000,
-    sensitiveRecords: 12500,
-    icon: Server,
-  },
-  {
-    id: "4",
-    name: "Google Cloud Storage",
-    type: "Cloud Storage",
-    status: "connected",
-    lastSync: "15 min ago",
-    totalRecords: 456000,
-    sensitiveRecords: 342,
-    icon: Cloud,
-  },
-];
 
 const typeFilters = [
   { value: "all", label: "All Types" },
@@ -230,71 +53,45 @@ const statusFilters = [
   { value: "resolved", label: "Resolved" },
 ];
 
-const sourceTypeIcons = {
-  database: Database,
-  cloud: Cloud,
-  file: FileText,
+const statusConfig: Record<string, { color: "success" | "info" | "danger" | "warning"; icon: React.ElementType }> = {
+  connected: { color: "success", icon: CheckCircle },
+  syncing: { color: "info", icon: RefreshCw },
+  error: { color: "danger", icon: AlertTriangle },
+  pending: { color: "warning", icon: Clock },
 };
 
-const statusConfig = {
-  connected: { color: "success" as const, icon: CheckCircle },
-  syncing: { color: "info" as const, icon: RefreshCw },
-  error: { color: "danger" as const, icon: AlertTriangle },
-  pending: { color: "warning" as const, icon: Clock },
+const recordStatusConfig: Record<string, { color: "danger" | "warning" | "success"; label: string }> = {
+  active: { color: "danger", label: "Active" },
+  investigating: { color: "warning", label: "Investigating" },
+  resolved: { color: "success", label: "Resolved" },
 };
 
-const recordStatusConfig = {
-  active: { color: "danger" as const, label: "Active" },
-  investigating: { color: "warning" as const, label: "Investigating" },
-  resolved: { color: "success" as const, label: "Resolved" },
+const riskLevelColors: Record<string, { bg: string; text: string; border: string; dot: string }> = {
+  critical: { bg: "bg-red-50", text: "text-red-700", border: "border-red-200", dot: "bg-red-500" },
+  high: { bg: "bg-orange-50", text: "text-orange-700", border: "border-orange-200", dot: "bg-orange-500" },
+  medium: { bg: "bg-yellow-50", text: "text-yellow-700", border: "border-yellow-200", dot: "bg-yellow-500" },
+  low: { bg: "bg-green-50", text: "text-green-700", border: "border-green-200", dot: "bg-green-500" },
 };
 
-const riskLevelColors = {
-  critical: {
-    bg: "bg-red-50",
-    text: "text-red-700",
-    border: "border-red-200",
-    dot: "bg-red-500",
-  },
-  high: {
-    bg: "bg-orange-50",
-    text: "text-orange-700",
-    border: "border-orange-200",
-    dot: "bg-orange-500",
-  },
-  medium: {
-    bg: "bg-yellow-50",
-    text: "text-yellow-700",
-    border: "border-yellow-200",
-    dot: "bg-yellow-500",
-  },
-  low: {
-    bg: "bg-green-50",
-    text: "text-green-700",
-    border: "border-green-200",
-    dot: "bg-green-500",
-  },
-};
-
-// SortIcon component moved outside to avoid recreating during render
-const SortIcon = ({ 
-  field, 
-  sortField, 
-  sortDirection 
-}: { 
-  field: string; 
-  sortField: string; 
+function SortIcon({
+  field,
+  sortField,
+  sortDirection,
+}: {
+  field: string;
+  sortField: string;
   sortDirection: "asc" | "desc";
-}) => {
+}) {
   if (sortField !== field) return <ChevronDown className="w-4 h-4 opacity-30" />;
   return sortDirection === "desc" ? (
     <ChevronDown className="w-4 h-4 text-[#036E6E]" />
   ) : (
     <ChevronUp className="w-4 h-4 text-[#036E6E]" />
   );
-};
+}
 
 export default function DataDiscoveryPage() {
+  const { data, error, loading, refetch } = useDataDiscovery();
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [riskFilter, setRiskFilter] = useState("all");
@@ -304,30 +101,32 @@ export default function DataDiscoveryPage() {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Filter and sort data
-  const filteredData = sensitiveDataRecords
-    .filter((record) => {
-      const matchesSearch =
-        record.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        record.source.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        record.location.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesType = typeFilter === "all" || record.type === typeFilter;
-      const matchesRisk = riskFilter === "all" || record.riskLevel === riskFilter;
-      const matchesStatus = statusFilter === "all" || record.status === statusFilter;
-      return matchesSearch && matchesType && matchesRisk && matchesStatus;
-    })
-    .sort((a, b) => {
-      const riskOrder = { critical: 4, high: 3, medium: 2, low: 1 };
-      if (sortField === "riskLevel") {
-        const diff = riskOrder[a.riskLevel] - riskOrder[b.riskLevel];
-        return sortDirection === "desc" ? -diff : diff;
-      }
-      if (sortField === "recordCount") {
-        const diff = a.recordCount - b.recordCount;
-        return sortDirection === "desc" ? -diff : diff;
-      }
-      return 0;
-    });
+  const filteredData = useMemo(() => {
+    if (!data?.assets) return [];
+    return data.assets
+      .filter((record) => {
+        const matchesSearch =
+          record.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          record.source.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          record.location.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesType = typeFilter === "all" || record.type === typeFilter;
+        const matchesRisk = riskFilter === "all" || record.riskLevel === riskFilter;
+        const matchesStatus = statusFilter === "all" || record.status === statusFilter;
+        return matchesSearch && matchesType && matchesRisk && matchesStatus;
+      })
+      .sort((a, b) => {
+        const riskOrder = { critical: 4, high: 3, medium: 2, low: 1 };
+        if (sortField === "riskLevel") {
+          const diff = riskOrder[a.riskLevel] - riskOrder[b.riskLevel];
+          return sortDirection === "desc" ? -diff : diff;
+        }
+        if (sortField === "recordCount") {
+          const diff = a.recordCount - b.recordCount;
+          return sortDirection === "desc" ? -diff : diff;
+        }
+        return 0;
+      });
+  }, [data?.assets, searchQuery, typeFilter, riskFilter, statusFilter, sortField, sortDirection]);
 
   const handleSort = (field: "riskLevel" | "recordCount" | "lastScanned") => {
     if (sortField === field) {
@@ -338,65 +137,124 @@ export default function DataDiscoveryPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-slate-50">
-      <Header
-        title="Data Discovery"
-        subtitle="Discover and classify sensitive data across your infrastructure"
-      />
-
-      <div className="p-6 space-y-6">
-        {/* Data Sources Overview */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-        >
-          {dataSources.map((source, index) => (
-            <motion.div
-              key={source.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className="relative overflow-hidden" hover>
-                <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-50 rounded-full blur-2xl -mr-10 -mt-10" />
-                <CardContent className="relative">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
-                      <source.icon className="w-5 h-5 text-slate-500" />
-                    </div>
-                    <Badge
-                      variant={statusConfig[source.status].color}
-                      size="sm"
-                      dot
-                    >
-                      {source.status}
-                    </Badge>
-                  </div>
-                  <h3 className="font-semibold text-slate-800 mb-1">{source.name}</h3>
-                  <p className="text-xs text-slate-500 mb-3">{source.type}</p>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-600 font-medium">
-                      {formatNumber(source.sensitiveRecords)} sensitive
-                    </span>
-                    <span className="text-slate-400">{source.lastSync}</span>
-                  </div>
-                </CardContent>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50">
+        <Header title="Data Discovery" subtitle="Discover and classify sensitive data across your infrastructure" />
+        <div className="p-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i} padding="md">
+                <div className="flex items-start justify-between mb-3">
+                  <Skeleton className="h-10 w-10 rounded-xl" />
+                  <Skeleton className="h-6 w-20 rounded-full" />
+                </div>
+                <Skeleton className="h-5 w-32 mb-2 rounded" />
+                <Skeleton className="h-3 w-24 mb-3 rounded" />
+                <div className="flex justify-between">
+                  <Skeleton className="h-4 w-16 rounded" />
+                  <Skeleton className="h-3 w-14 rounded" />
+                </div>
               </Card>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Search and Filters */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
+            ))}
+          </div>
           <Card padding="lg">
             <div className="flex flex-col lg:flex-row gap-4">
-              {/* Search */}
+              <Skeleton className="h-11 flex-1 rounded-xl" />
+              <Skeleton className="h-11 w-24 rounded-xl" />
+              <div className="flex gap-2">
+                <Skeleton className="h-11 w-28 rounded-xl" />
+                <Skeleton className="h-11 w-24 rounded-xl" />
+              </div>
+            </div>
+          </Card>
+          <Card padding="none">
+            <div className="overflow-x-auto">
+              <div className="px-6 py-4 border-b border-slate-200 flex gap-4">
+                {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                  <Skeleton key={i} className="h-4 flex-1 min-w-[80px] rounded" />
+                ))}
+              </div>
+              <div className="divide-y divide-slate-100">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                  <div key={i} className="px-6 py-4 flex items-center gap-4">
+                    <Skeleton className="h-8 w-8 rounded" />
+                    <Skeleton className="h-4 w-32 rounded" />
+                    <Skeleton className="h-4 w-24 rounded" />
+                    <Skeleton className="h-4 w-16 rounded" />
+                    <Skeleton className="h-6 w-14 rounded-full" />
+                    <Skeleton className="h-6 w-12 rounded-full" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-50">
+        <Header title="Data Discovery" subtitle="Discover and classify sensitive data across your infrastructure" />
+        <div className="p-6 flex items-center justify-center min-h-[60vh]">
+          <Card padding="lg" className="max-w-md">
+            <div className="text-center">
+              <p className="text-red-600 font-medium mb-2">{error.message}</p>
+              <p className="text-sm text-slate-500 mb-4">Code: {error.code}</p>
+              <Button onClick={refetch}>Try again</Button>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) return null;
+
+  const { sources, assets } = data;
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <Header title="Data Discovery" subtitle="Discover and classify sensitive data across your infrastructure" />
+
+      <div className="p-6 space-y-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="overflow-x-auto pb-2 scrollbar-thin -mx-1 px-1">
+          <div className="flex gap-4 flex-nowrap min-h-0">
+            {sources.map((source, index) => {
+              const SourceIcon = getDataSourceIcon(source.iconKey);
+              const config = statusConfig[source.status];
+              return (
+                <motion.div key={source.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} className="shrink-0 w-[280px]">
+                  <Card className="relative overflow-hidden h-full" hover>
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-50 rounded-full blur-2xl -mr-10 -mt-10" />
+                    <CardContent className="relative">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
+                          <SourceIcon className="w-5 h-5 text-slate-500" />
+                        </div>
+                        <Badge variant={config?.color ?? "default"} size="sm" dot>
+                          {source.status}
+                        </Badge>
+                      </div>
+                      <h3 className="font-semibold text-slate-800 mb-1 truncate" title={source.name}>{source.name}</h3>
+                      <p className="text-xs text-slate-500 mb-3">{source.type}</p>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-600 font-medium">{formatNumber(source.sensitiveRecords)} sensitive</span>
+                        <span className="text-slate-400 shrink-0 ml-1">{source.lastSync}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <Card padding="lg">
+            <div className="flex flex-col lg:flex-row gap-4">
               <div className="flex-1">
                 <Input
                   placeholder="Search by name, source, or location..."
@@ -405,13 +263,7 @@ export default function DataDiscoveryPage() {
                   icon={<Search className="w-5 h-5" />}
                 />
               </div>
-
-              {/* Filter Toggle */}
-              <Button
-                variant="secondary"
-                onClick={() => setShowFilters(!showFilters)}
-                icon={<Filter className="w-4 h-4" />}
-              >
+              <Button variant="secondary" onClick={() => setShowFilters(!showFilters)} icon={<Filter className="w-4 h-4" />}>
                 Filters
                 {(typeFilter !== "all" || riskFilter !== "all" || statusFilter !== "all") && (
                   <span className="ml-2 w-5 h-5 rounded-full bg-emerald-100 text-[#024443] text-xs flex items-center justify-center">
@@ -419,19 +271,11 @@ export default function DataDiscoveryPage() {
                   </span>
                 )}
               </Button>
-
-              {/* Actions */}
               <div className="flex items-center gap-2">
-                <Button variant="secondary" icon={<RefreshCw className="w-4 h-4" />}>
-                  Scan Now
-                </Button>
-                <Button variant="secondary" icon={<Download className="w-4 h-4" />}>
-                  Export
-                </Button>
+                <Button variant="secondary" icon={<RefreshCw className="w-4 h-4" />}>Scan Now</Button>
+                <Button variant="secondary" icon={<Download className="w-4 h-4" />}>Export</Button>
               </div>
             </div>
-
-            {/* Expanded Filters */}
             <AnimatePresence>
               {showFilters && (
                 <motion.div
@@ -442,56 +286,39 @@ export default function DataDiscoveryPage() {
                   className="overflow-hidden"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 mt-4 border-t border-slate-200">
-                    {/* Type Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-2">
-                        Data Type
-                      </label>
+                      <label className="block text-sm font-medium text-slate-600 mb-2">Data Type</label>
                       <select
                         value={typeFilter}
                         onChange={(e) => setTypeFilter(e.target.value)}
                         className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 focus:border-[#036E6E] focus:ring-1 focus:ring-[#036E6E]/20 transition-all outline-none text-sm"
                       >
-                        {typeFilters.map((filter) => (
-                          <option key={filter.value} value={filter.value}>
-                            {filter.label}
-                          </option>
+                        {typeFilters.map((f) => (
+                          <option key={f.value} value={f.value}>{f.label}</option>
                         ))}
                       </select>
                     </div>
-
-                    {/* Risk Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-2">
-                        Risk Level
-                      </label>
+                      <label className="block text-sm font-medium text-slate-600 mb-2">Risk Level</label>
                       <select
                         value={riskFilter}
                         onChange={(e) => setRiskFilter(e.target.value)}
                         className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 focus:border-[#036E6E] focus:ring-1 focus:ring-[#036E6E]/20 transition-all outline-none text-sm"
                       >
-                        {riskFilters.map((filter) => (
-                          <option key={filter.value} value={filter.value}>
-                            {filter.label}
-                          </option>
+                        {riskFilters.map((f) => (
+                          <option key={f.value} value={f.value}>{f.label}</option>
                         ))}
                       </select>
                     </div>
-
-                    {/* Status Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-2">
-                        Status
-                      </label>
+                      <label className="block text-sm font-medium text-slate-600 mb-2">Status</label>
                       <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
                         className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 focus:border-[#036E6E] focus:ring-1 focus:ring-[#036E6E]/20 transition-all outline-none text-sm"
                       >
-                        {statusFilters.map((filter) => (
-                          <option key={filter.value} value={filter.value}>
-                            {filter.label}
-                          </option>
+                        {statusFilters.map((f) => (
+                          <option key={f.value} value={f.value}>{f.label}</option>
                         ))}
                       </select>
                     </div>
@@ -502,16 +329,10 @@ export default function DataDiscoveryPage() {
           </Card>
         </motion.div>
 
-        {/* Results Summary */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="flex items-center justify-between"
-        >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="flex items-center justify-between">
           <p className="text-sm text-slate-500">
             Showing <span className="text-slate-700 font-medium">{filteredData.length}</span> of{" "}
-            <span className="text-slate-700 font-medium">{sensitiveDataRecords.length}</span> records
+            <span className="text-slate-700 font-medium">{assets.length}</span> records
           </p>
           <div className="flex items-center gap-4 text-sm">
             <span className="flex items-center gap-2 text-red-600">
@@ -525,26 +346,15 @@ export default function DataDiscoveryPage() {
           </div>
         </motion.div>
 
-        {/* Data Table */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
           <Card padding="none" className="overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50">
-                    <th className="text-left px-6 py-4 text-sm font-medium text-slate-600">
-                      Data Asset
-                    </th>
-                    <th className="text-left px-6 py-4 text-sm font-medium text-slate-600">
-                      Source
-                    </th>
-                    <th className="text-left px-6 py-4 text-sm font-medium text-slate-600">
-                      Type
-                    </th>
+                    <th className="text-left px-6 py-4 text-sm font-medium text-slate-600">Data Asset</th>
+                    <th className="text-left px-6 py-4 text-sm font-medium text-slate-600">Source</th>
+                    <th className="text-left px-6 py-4 text-sm font-medium text-slate-600">Type</th>
                     <th
                       className="text-left px-6 py-4 text-sm font-medium text-slate-600 cursor-pointer hover:text-slate-800 transition-colors"
                       onClick={() => handleSort("riskLevel")}
@@ -563,29 +373,23 @@ export default function DataDiscoveryPage() {
                         <SortIcon field="recordCount" sortField={sortField} sortDirection={sortDirection} />
                       </div>
                     </th>
-                    <th className="text-left px-6 py-4 text-sm font-medium text-slate-600">
-                      Status
-                    </th>
-                    <th className="text-right px-6 py-4 text-sm font-medium text-slate-600">
-                      Actions
-                    </th>
+                    <th className="text-left px-6 py-4 text-sm font-medium text-slate-600">Status</th>
+                    <th className="text-right px-6 py-4 text-sm font-medium text-slate-600">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredData.map((record, index) => {
-                    const SourceIcon = sourceTypeIcons[record.sourceType];
+                    const SourceIcon = sourceTypeIconMap[record.sourceType];
                     const riskColors = riskLevelColors[record.riskLevel];
                     const isExpanded = expandedRow === record.id;
-
+                    const statusCfg = recordStatusConfig[record.status];
                     return (
                       <React.Fragment key={record.id}>
                         <motion.tr
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className={`border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer ${
-                            isExpanded ? "bg-slate-50" : ""
-                          }`}
+                          className={`border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer ${isExpanded ? "bg-slate-50" : ""}`}
                           onClick={() => setExpandedRow(isExpanded ? null : record.id)}
                         >
                           <td className="px-6 py-4">
@@ -593,9 +397,7 @@ export default function DataDiscoveryPage() {
                               <span className="text-xl">{dataTypeIcons[record.type]}</span>
                               <div>
                                 <p className="font-medium text-slate-800">{record.name}</p>
-                                <p className="text-xs text-slate-500 truncate max-w-[200px]">
-                                  {record.location}
-                                </p>
+                                <p className="text-xs text-slate-500 truncate max-w-[200px]">{record.location}</p>
                               </div>
                             </div>
                           </td>
@@ -613,19 +415,15 @@ export default function DataDiscoveryPage() {
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
                               <span className={`w-2 h-2 rounded-full ${riskColors.dot}`} />
-                              <span className={`text-sm font-medium capitalize ${riskColors.text}`}>
-                                {record.riskLevel}
-                              </span>
+                              <span className={`text-sm font-medium capitalize ${riskColors.text}`}>{record.riskLevel}</span>
                             </div>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="text-sm text-slate-700 font-medium">
-                              {formatNumber(record.recordCount)}
-                            </span>
+                            <span className="text-sm text-slate-700 font-medium">{formatNumber(record.recordCount)}</span>
                           </td>
                           <td className="px-6 py-4">
-                            <Badge variant={recordStatusConfig[record.status].color} size="sm" dot>
-                              {recordStatusConfig[record.status].label}
+                            <Badge variant={statusCfg.color} size="sm" dot>
+                              {statusCfg.label}
                             </Badge>
                           </td>
                           <td className="px-6 py-4">
@@ -642,8 +440,6 @@ export default function DataDiscoveryPage() {
                             </div>
                           </td>
                         </motion.tr>
-
-                        {/* Expanded Row */}
                         <AnimatePresence>
                           {isExpanded && (
                             <motion.tr
@@ -654,11 +450,8 @@ export default function DataDiscoveryPage() {
                             >
                               <td colSpan={7} className="px-6 py-4">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                  {/* Classifications */}
                                   <div>
-                                    <h4 className="text-sm font-medium text-slate-600 mb-3">
-                                      Data Classifications
-                                    </h4>
+                                    <h4 className="text-sm font-medium text-slate-600 mb-3">Data Classifications</h4>
                                     <div className="flex flex-wrap gap-2">
                                       {record.classification.map((cls) => (
                                         <Badge key={cls} variant="default" size="sm">
@@ -667,12 +460,8 @@ export default function DataDiscoveryPage() {
                                       ))}
                                     </div>
                                   </div>
-
-                                  {/* Details */}
                                   <div>
-                                    <h4 className="text-sm font-medium text-slate-600 mb-3">
-                                      Details
-                                    </h4>
+                                    <h4 className="text-sm font-medium text-slate-600 mb-3">Details</h4>
                                     <div className="space-y-2 text-sm">
                                       <div className="flex items-center justify-between">
                                         <span className="text-slate-500">Last Scanned</span>
@@ -688,12 +477,8 @@ export default function DataDiscoveryPage() {
                                       </div>
                                     </div>
                                   </div>
-
-                                  {/* Quick Actions */}
                                   <div>
-                                    <h4 className="text-sm font-medium text-slate-600 mb-3">
-                                      Quick Actions
-                                    </h4>
+                                    <h4 className="text-sm font-medium text-slate-600 mb-3">Quick Actions</h4>
                                     <div className="flex flex-wrap gap-2">
                                       <Button variant="secondary" size="sm" icon={<Play className="w-3 h-3" />}>
                                         Re-scan
@@ -720,30 +505,17 @@ export default function DataDiscoveryPage() {
                 </tbody>
               </table>
             </div>
-
-            {/* Pagination */}
             <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between bg-slate-50">
-              <p className="text-sm text-slate-500">
-                Page 1 of 1
-              </p>
+              <p className="text-sm text-slate-500">Page 1 of 1</p>
               <div className="flex items-center gap-2">
-                <Button variant="secondary" size="sm" disabled>
-                  Previous
-                </Button>
-                <Button variant="secondary" size="sm" disabled>
-                  Next
-                </Button>
+                <Button variant="secondary" size="sm" disabled>Previous</Button>
+                <Button variant="secondary" size="sm" disabled>Next</Button>
               </div>
             </div>
           </Card>
         </motion.div>
 
-        {/* Help Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
           <Card className="bg-gradient-to-r from-purple-50 via-teal-50 to-emerald-50 border-purple-100" padding="lg">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-4">
@@ -757,10 +529,7 @@ export default function DataDiscoveryPage() {
                   </p>
                 </div>
               </div>
-              <Button
-                variant="primary"
-                icon={<Play className="w-4 h-4" />}
-              >
+              <Button variant="primary" icon={<Play className="w-4 h-4" />}>
                 Run AI Classification
               </Button>
             </div>

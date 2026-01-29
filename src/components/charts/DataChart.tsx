@@ -16,7 +16,7 @@ import {
   Cell,
 } from "recharts";
 
-interface DataPoint {
+export interface DataPoint {
   name: string;
   value: number;
   value2?: number;
