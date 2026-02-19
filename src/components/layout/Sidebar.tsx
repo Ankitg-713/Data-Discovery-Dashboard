@@ -20,6 +20,7 @@ import {
   Database,
   Bell,
   Plug,
+  FileCheck,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -62,6 +63,12 @@ const navItems = [
     name: "Integrations",
     href: "/integrations",
     icon: Plug,
+    badge: null,
+  },
+  {
+    name: "Policies",
+    href: "/policies",
+    icon: FileCheck,
     badge: null,
   },
 ];
@@ -218,7 +225,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           </nav>
         </div>
 
-        {/* Secondary Nav */}
+        {/* Management section - commented out
         <div className="mb-6">
           {!isCollapsed && (
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mb-2">
@@ -261,6 +268,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
             ))}
           </nav>
         </div>
+        */}
 
         {/* Stats Card - Only show when expanded */}
         {!isCollapsed && (
